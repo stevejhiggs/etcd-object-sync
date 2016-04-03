@@ -13,13 +13,13 @@ const set = (key, value) => {
     return;
   }
 
-  etcd.set(key, JSON.stringify(value));
+  etcd.set(key, JSON.stringify({ value: value }));
 };
 
 const sync = (key, syncCallback) => {
   const watcher = etcd.watcher(key, null, {recursive: false});
   watcher.on("set", (value) => {
-    syncCallback(null, JSON.parse(value.node.value));
+    syncCallback(null, JSON.parse(value.node.value).value);
   });
 
   watcher.on("delete", () => {
@@ -33,7 +33,7 @@ const sync = (key, syncCallback) => {
         return syncCallback(null, undefined);
       }
 
-      syncCallback(err, JSON.parse(value.node.value));
+      syncCallback(err, JSON.parse(value.node.value).value);
     });
   }
 };
